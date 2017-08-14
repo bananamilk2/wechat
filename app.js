@@ -1,34 +1,37 @@
 'use strict';
 
-const isProduction = process.env.NODE_ENV === 'production';
+const logger = require('./tools/logger');
 
-var appID = 'wxb440d73a1047a269';
-var appsecret = 'a1293801522fc9dd42dc118fa5ee7c8e';
+const isProduction = process.env.NODE_ENV === 'production';
 
 const Koa = require('koa');
 
 const app = new Koa();
 
-const recording  = require('./middlewares/middleware-recording')
+const verify     = require('./middlewares/middleware-verify');
+const recording  = require('./middlewares/middleware-recording');
 const bodyParser = require('koa-bodyparser');
 const controller = require('./middlewares/middleware-controller');
 const templating = require('./middlewares/middleware-templating');
 const staticFiles= require('./middlewares/middleware-static-files');
 const xmlParser  = require('./middlewares/middleware-xmlparser');
 const wx = require('./wx')
+const config = require('./config');
+const autoReply = require('./auto_reply');
 
-app.use(recording());
-app.use(staticFiles('/static/', __dirname + '/static'));
-app.use(bodyParser());
-app.use(xmlParser());
-app.use(templating('view', {
-    noCache : !isProduction,
-    watch : !isProduction
-}))
-app.use(controller());
+app.use(verify(config.wechat, autoReply.reply));
+// app.use(recording());
+// app.use(staticFiles('/static/', __dirname + '/static'));
+// app.use(bodyParser());
+// app.use(xmlParser());
+// app.use(templating('view', {
+//     noCache : !isProduction,
+//     watch : !isProduction
+// }))
+// app.use(controller());
 
 app.listen(8080);
-console.log('app started at port 8080');
+logger.debug('app started at port 8080');
 
 var schedule  = require('node-schedule');
 var rule = new schedule.RecurrenceRule();
@@ -69,17 +72,63 @@ rule.second = time;
 // });
 
 
+//------------------
 // var https = require('request');
 // var qs = require('querystring');
 // var data = {
 //     grant_type : 'client_credential',
-//     appid : appID,
-//     secret : appsecret
+//     appid : app_ID,
+//     secret : app_secret
 // };
 // var content = qs.stringify(data); 
 // var url = 'https://api.weixin.qq.com' + '/cgi-bin/token?' + content;
 
+// var token = "";
+
 // https(url, function(error, response, body){
-//     console.log('body: ', body);
+//     // var obj = eval('(' + body + ')');
+//     var obj = JSON.parse(body);
+//     console.log('token: '+obj.access_token);
+//     token = obj.access_token;
 // });
 
+//---------------------
+
+
+
+var WechatAPI = require('wechat-api');
+//创建自定义菜单
+// var api = new WechatAPI(app_ID, app_secret);
+
+var menu = {"button":[
+    {
+        "type":"click",
+        "name":"今日歌曲",
+        "key":"V1001_TODAY_MUSIC"
+    },
+    {
+        "name":"菜单",
+        "sub_button":[
+            {
+                "type":"view",
+                "name":"搜索",
+                "url":"http://www.soso.com/"
+            },
+            {
+                "type":"click",
+                "name":"赞一下我们",
+                "key":"V1001_GOOD"
+            }
+        ]
+     }
+    ]};
+
+// var co = require('co');
+// console.log('appMenu start');
+// api.createMenu(menu, function(err, result) {
+//     if (err) {
+//       throw err
+//     };
+//     console.log('appMenu', result);
+//   });
+//   console.log('appMenu end');
