@@ -21,14 +21,14 @@ const autoReply = require('./auto_reply');
 
 app.use(verify(config.wechat, autoReply.reply));
 // app.use(recording());
-// app.use(staticFiles('/static/', __dirname + '/static'));
-// app.use(bodyParser());
-// app.use(xmlParser());
-// app.use(templating('view', {
-//     noCache : !isProduction,
-//     watch : !isProduction
-// }))
-// app.use(controller());
+app.use(staticFiles('/static/', __dirname + '/static'));
+app.use(bodyParser());
+app.use(xmlParser());
+app.use(templating('view', {
+    noCache : !isProduction,
+    watch : !isProduction
+}))
+app.use(controller());
 
 app.listen(8080);
 logger.debug('app started at port 8080');

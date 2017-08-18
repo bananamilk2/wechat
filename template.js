@@ -50,7 +50,10 @@ var template = heredoc(function(){/*
 */});
 
 var compiled = ejs.compile(template);
-exports = module.exports = {
-    compiled : compiled
-}
+// exports = module.exports = {
+//     compiled : compiled
+// }
+
+exports.compiled = compiled;
+
 

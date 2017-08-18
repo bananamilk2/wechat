@@ -18,7 +18,7 @@ module.exports.readFileAsync = function(fpath, encoding){
 module.exports.writeFileAsync = function(fpath, content){
     return new Promise(function (resolve, reject){
         fs.writeFile(fpath, content, function(err, content){
-            logger.debug('save token');
+            logger.debug('save to file');
             if(err) reject(err);
             else resolve(content);
         });
@@ -48,4 +48,5 @@ module.exports.tpl = function(reply_content, wechat_message){
     logger.debug('autoreply: '+ ret);
     return ret;
 };
+
 

@@ -22,11 +22,12 @@ module.exports = function(opts, auto_reply){
 
         if(this.req.method === "GET"){    //验证
             if(sha === signature){
-                this.res.body = echostr + "";
+                this.body = echostr + "";
                 logger.debug('验证通过');
             }else{
-                this.res.body = 'wrong';
+                this.body = 'wrong';
                 logger.error('验证失败');
+                yield next;  //继续处理请求
             }
         }else if(this.req.method === "POST"){    
             if(sha !== signature){

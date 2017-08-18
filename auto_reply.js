@@ -1,8 +1,37 @@
 var logger = require('./tools/logger');
 var config = require('./config');
 var Wechat = require('./wechat');
+var menu = require('./menu');
+
+
+// var menu = {"button":[
+//     {
+//         "type":"click",
+//         "name":"今日歌曲",
+//         "key":"V1001_TODAY_MUSIC"
+//     },
+//     {
+//         "name":"菜单",
+//         "sub_button":[
+//             {
+//                 "type":"view",
+//                 "name":"搜索",
+//                 "url":"http://www.soso.com/"
+//             },
+//             {
+//                 "type":"click",
+//                 "name":"赞一下我们",
+//                 "key":"V1001_GOOD"
+//             }
+//         ]
+//      }
+//     ]};
 
 var wechatApi = new Wechat(config.wechat);
+wechatApi.deleteMenu().then(function(){
+    logger.debug('delete menu');
+    return wechatApi.createMenu(menu);
+});
 
 module.exports.reply = function*(next){
     var message = this.wechat_message;
@@ -56,6 +85,23 @@ module.exports.reply = function*(next){
                 description : '呵呵',
                 media_id : data.media_id
             }
+        }else if(content === '10'){
+            var group = yield wechatApi.createGroup('wechat');
+            logger.debug('新的分组');
+            logger.debug(group);
+            var groups = yield wechatApi.fetchGroups();
+            logger.debug(groups);
+        }else if(content === '11'){
+            var semantic = {
+                query : '机票',
+                city : '北京',
+                category : 'movie',
+                uid : message.FromUserName
+            }
+            var data = yield wechatApi.semantic(semantic);
+            reply = JSON.stringify(data);
+        }else if(content === '12'){
+
         }
 
         this.body = reply;
@@ -63,5 +109,5 @@ module.exports.reply = function*(next){
     }else if(message.MsgType === 'video'){
 
     }
-    yield next;
+    // yield next;
 };
